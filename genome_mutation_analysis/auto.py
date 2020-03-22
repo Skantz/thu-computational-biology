@@ -23,22 +23,31 @@ with open("DataTable.tsv", "r") as csvf:
     for i, line in enumerate(df):
         op_line = line
         for j, kv_tup in enumerate(line):
-            if kv_tup[0] in HEADERS_MUT:
-                op_line[1] = literal_eval(kv_tup[1])
+            if kv_tup in HEADERS_MUT:
+                #print(kv_tup)
+                line[kv_tup] = literal_eval(line[kv_tup])
         dr_content.append(op_line)
 
-#list list key value pair
+selection_names = []
 
-#print(dr_content[0])
-
-
-
-for line in dr_content:
-    for kv_pair in line:
-        if kv_pair[0] not in (HEADERS_MUT):
+for i, line in enumerate(dr_content):
+    #print(line)
+    for j, key in enumerate(line):
+        #print(line[kv_pair])
+        if key not in (HEADERS_MUT):
             continue
-        for mut in kv_pair[1]:
-            cmd.select("resi " + str(mut[1]))
+        for k, mut in enumerate(line[key]):
+            name = key.split()[0] + "_" +  str(i)
+            cmd.select(name, "resi " + str(mut[1]) + " in " + key.split()[0])
+            selection_names.append(name)
 
-#cmd.show("cartoon", "sele")
+cmd.hide("all")
+cmd.show("spheres")
 
+
+#for prot in HEADERS_PROT:
+#    cmd.alter(prot, "vdw=" + str(0.1))
+
+for name in selection_names:
+    cmd.alter(name, "cdw=" + str(2))
+    cmd.color("red", name)
