@@ -5,8 +5,6 @@ from ast import literal_eval
 from pymol import cmd
 
 
-
-
 ###################
 
 '''
@@ -137,7 +135,7 @@ with open("DataTable.tsv", "r") as csvf:
         dr_content.append(op_line)
 
 selection_names = []
-mutations = []
+name_mutation_tuples = []
 
 for i, line in enumerate(dr_content):
     #print(line)
@@ -148,7 +146,7 @@ for i, line in enumerate(dr_content):
         for k, mut in enumerate(line[key]):
             name = key.split()[0] + "_" +  str(i)
             cmd.select(name, "resi " + str(mut[1]) + " in " + key.split()[0])
-            mutations.append(mut)
+            name_mutation_tuples.append((name, mut))
             selection_names.append(name)
 
 cmd.hide("all")
@@ -161,13 +159,19 @@ cmd.show("surface")
 sr_selname = findSurfaceResidues("all", 2.5, 1)
 
 exposed_res = [tup[1] for tup in sr_selname]
-mutation_index = [trip[1] for trip in mutations]
+mutation_index = [trip[1][1] for trip in name_mutation_tuples]
         
 exposed_mut = [n for n in mutation_index if n in exposed_res]
 
-print(len(exposed_mut)/len(mutations))
+print("total mut", len(name_mutation_tuples))
+print("mut on surface", len(exposed_mut))
+print(len(exposed_mut)/len(name_mutation_tuples))
 
-print(mutations)
 for name in selection_names:
     cmd.alter(name, "cdw=" + str(2))
-    cmd.color("red", name)
+    cmd.color("blue", name)
+
+print(name_mutation_tuples)
+for name_mut in name_mutation_tuples:
+    cmd.color("green", name)
+
