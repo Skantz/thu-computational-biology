@@ -170,7 +170,6 @@ class SentRNN(torch.nn.Module):
                 print("val roc", roc)
 
 
-
     def test(self, test_x, test_y=None):
         #train_y = train_y.reshape(32, 1, -1)
         if test_y == None:
@@ -192,10 +191,37 @@ class SentRNN(torch.nn.Module):
                 #reference, not copy 
                 #x_test[x < 0.5] = -1
                 #x_test[x >= 0.5] = 1
-                #print(x_test)
-                #print(label)
-                #print(x_test == label)
+
                 preds += x.cpu().tolist()
                 #print("loss", loss)
             iter += 1
+        #print("preds inside model", preds)
         return np.array(preds)
+
+
+    def predict(self, test_x):
+        #train_y = train_y.reshape(32, 1, -1)
+
+        dl = torch.utils.data.DataLoader(test_x,batch_size=1,shuffle=False, drop_last=True)
+        preds = []
+        iter = 0
+        for target in dl:
+            #Temporary
+            target = target.repeat(32, 1)
+            target = target.to(self.device)
+            with torch.no_grad():
+                dummy_label = torch.zeros(size=(target.shape[0], 1)).to(self.device)
+                _, x = self.forward(target, dummy_label)
+                x = x.squeeze(1)
+                x_test = x
+                #x_test[x < 0.5] = -1
+                #x_test[x >= 0.5] = 1
+                #print(x_test)
+                #print(label)
+                #print(x_test == label)
+                #print("PREDS IN LOOP", preds)
+                preds += x.cpu().tolist()
+                #print("loss", loss)
+            iter += 1
+        #print("preds inside model", preds)
+        return np.array(preds[0])
