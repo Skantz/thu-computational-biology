@@ -1,0 +1,3 @@
+[submodule "repositioning/KnowledgeGraphEmbedding"]
+	path = repositioning/KnowledgeGraphEmbedding
+	url = https://github.com/DeepGraphLearning/KnowledgeGraphEmbedding.git
